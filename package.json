@@ -8,7 +8,11 @@
   "scripts": {
     "dev": "npm run dev -w @halcontoro/web",
     "build": "npm run build -w @halcontoro/engine && npm run build -w @halcontoro/web",
+    "deploy": "npm run build && npx wrangler deploy",
     "test": "npm run test -w @halcontoro/engine",
     "lint": "npm run lint -w @halcontoro/web"
+  },
+  "devDependencies": {
+    "wrangler": "^4.14.0"
   }
 }
