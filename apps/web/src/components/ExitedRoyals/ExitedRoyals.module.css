@@ -1,0 +1,76 @@
+.rack {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  /* Prevent explosion when parent is full page width (e.g. tutorial). */
+  width: min(100%, 8.5rem);
+}
+
+.rackCompact {
+  grid-template-columns: repeat(4, minmax(2.4rem, 3rem));
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.5rem;
+}
+
+.slot {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(196, 181, 154, 0.28);
+  background: rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.filled {
+  border-style: solid;
+  border-color: rgba(196, 181, 154, 0.45);
+  background: rgba(30, 26, 40, 0.85);
+  animation: arrive 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.empty {
+  opacity: 0.55;
+}
+
+.placeholder {
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 181, 154, 0.25);
+}
+
+.piece {
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes arrive {
+  from {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filled {
+    animation: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .rack:not(.rackCompact) {
+    margin-top: 0;
+    margin-inline-start: auto;
+    grid-template-columns: repeat(4, minmax(2.6rem, 3.4rem));
+    width: fit-content;
+  }
+}

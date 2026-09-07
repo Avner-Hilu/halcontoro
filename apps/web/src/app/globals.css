@@ -1,0 +1,53 @@
+:root {
+  --bg-deep: #12101a;
+  --bg-stone: #1c1826;
+  --bg-panel: #252033;
+  --metal: #c4b59a;
+  --metal-dim: #8a7d68;
+  --accent-halcon: #6b8cae;
+  --accent-toro: #b08a5a;
+  --board-light: #cfc3ad;
+  --board-dark: #8a7358;
+  --board-mid: #a89274;
+  --target-line: rgba(232, 210, 150, 0.9);
+  --target-line-label: #f2ebe0;
+  --highlight: rgba(232, 196, 96, 0.55);
+  --selected: rgba(255, 255, 255, 0.35);
+  --danger: #c45c5c;
+  --text: #f2ebe0;
+  --text-muted: #a89b88;
+  --radius: 10px;
+  --font-display: "Segoe UI", "Heebo", "Arial", sans-serif;
+  --font-body: "Segoe UI", "Heebo", "Arial", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse at top, #2a2438 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg-deep), #0d0b12 70%);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+a {
+  color: var(--metal);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

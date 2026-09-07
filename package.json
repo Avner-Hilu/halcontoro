@@ -1,0 +1,14 @@
+{
+  "name": "halcontoro",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @halcontoro/web",
+    "build": "npm run build -w @halcontoro/engine && npm run build -w @halcontoro/web",
+    "test": "npm run test -w @halcontoro/engine",
+    "lint": "npm run lint -w @halcontoro/web"
+  }
+}

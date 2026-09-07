@@ -1,0 +1,80 @@
+.setupPage {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.back {
+  align-self: flex-start;
+  color: var(--metal);
+}
+
+.title {
+  margin: 0;
+  color: var(--metal);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.block {
+  width: min(28rem, 100%);
+  background: var(--bg-panel);
+  border: 1px solid rgba(196, 181, 154, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.block h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.row button {
+  border: 1px solid rgba(196, 181, 154, 0.35);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.row button.active {
+  background: linear-gradient(135deg, #8a7350, #c4b59a);
+  color: #1a1410;
+  border-color: transparent;
+}
+
+.start {
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.6rem;
+  background: linear-gradient(135deg, #8a7350, #c4b59a);
+  color: #1a1410;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.thinking {
+  margin: 0;
+  color: var(--metal);
+  font-size: 0.95rem;
+}
