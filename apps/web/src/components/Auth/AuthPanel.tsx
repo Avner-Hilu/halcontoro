@@ -61,7 +61,11 @@ export function AuthPanel() {
     });
     setBusy(false);
     if (error) {
-      setMessage(error.message);
+      const hint =
+        error.message === "Failed to fetch"
+          ? " לא מצליחים להגיע ל־Supabase — בדקו ב־Cloudflare ש־NEXT_PUBLIC_SUPABASE_URL זהה בדיוק ל־Project URL בדשבורד Supabase (העתיקו שוב), ואז בנייה מחדש."
+          : "";
+      setMessage(`${error.message}${hint}`);
       return;
     }
     setMessage("נשלח קישור התחברות למייל. בדקו גם בספאם.");
@@ -80,10 +84,16 @@ export function AuthPanel() {
     });
     setBusy(false);
     if (error) {
+      const hint =
+        error.message === "Failed to fetch"
+          ? " לא מצליחים להגיע ל־Supabase — בדקו ב־Cloudflare ש־NEXT_PUBLIC_SUPABASE_URL זהה בדיוק ל־Project URL בדשבורד Supabase (העתיקו שוב), ואז בנייה מחדש."
+          : error.message.includes("anonymous")
+            ? " התחברות כאורח לא מופעלת עדיין ב־Supabase (Authentication → Providers → Anonymous)."
+            : "";
       setMessage(
-        error.message.includes("anonymous")
-          ? "התחברות כאורח לא מופעלת עדיין ב־Supabase (Authentication → Providers → Anonymous)."
-          : error.message,
+        error.message.includes("anonymous") && !error.message.includes("Failed")
+          ? `התחברות כאורח לא מופעלת עדיין ב־Supabase (Authentication → Providers → Anonymous).`
+          : `${error.message}${hint}`,
       );
       return;
     }
