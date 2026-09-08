@@ -21,6 +21,9 @@ export default function HomePage() {
           <Link className={styles.secondary} href="/play/local">
             משחק מקומי לשניים
           </Link>
+          <Link className={styles.secondary} href="/account">
+            התחברות
+          </Link>
         </div>
         <p className={styles.credit}>הומצא בידי Amit Hilu</p>
       </div>
