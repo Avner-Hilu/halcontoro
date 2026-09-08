@@ -39,6 +39,7 @@ import {
   subscribeRoom,
   type RoomBundle,
 } from "@/lib/online";
+import { openWhatsAppInvite, roomInviteUrl } from "@/lib/online/invite";
 import { sideLabel } from "@/lib/pieces";
 import boardStyles from "@/components/LocalGame/LocalGame.module.css";
 import styles from "./OnlinePlay.module.css";
@@ -83,6 +84,24 @@ export function OnlinePlay() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [bundle, setBundle] = useState<RoomBundle | null>(null);
+  const inviteHandled = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw =
+      new URLSearchParams(window.location.search).get("code") ??
+      sessionStorage.getItem("ht_invite_code");
+    if (!raw) return;
+    const code = raw
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 6);
+    if (code.length >= 4) {
+      setJoinCode(code);
+      sessionStorage.setItem("ht_invite_code", code);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -103,6 +122,8 @@ export function OnlinePlay() {
       if (!uid) {
         setBundle(null);
         setPhase("auth");
+      } else {
+        setPhase((p) => (p === "auth" ? "lobby" : p));
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -153,21 +174,54 @@ export function OnlinePlay() {
     }
   };
 
+  const joinWithCode = useCallback(
+    async (code: string) => {
+      setBusy(true);
+      setMessage(null);
+      try {
+        const next = await joinRoom(code);
+        enterBundle(next);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("code");
+          window.history.replaceState({}, "", url.pathname);
+        }
+      } catch (err) {
+        setMessage(
+          humanizeOnlineError(err instanceof Error ? err.message : String(err)),
+        );
+      } finally {
+        setBusy(false);
+      }
+    },
+    [enterBundle],
+  );
+
   const onJoin = async (e: FormEvent) => {
     e.preventDefault();
-    setBusy(true);
-    setMessage(null);
-    try {
-      const next = await joinRoom(joinCode);
-      enterBundle(next);
-    } catch (err) {
-      setMessage(
-        humanizeOnlineError(err instanceof Error ? err.message : String(err)),
-      );
-    } finally {
-      setBusy(false);
-    }
+    await joinWithCode(joinCode);
   };
+
+  // Invite from ?code= or sessionStorage → auto-join when logged in on lobby.
+  useEffect(() => {
+    if (!ready || !userId || phase !== "lobby" || busy || inviteHandled.current) {
+      return;
+    }
+    if (joinCode.trim().length < 6) return;
+    const fromInvite =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).has("code") ||
+        sessionStorage.getItem("ht_invite_code") ===
+          joinCode.trim().toUpperCase());
+    if (!fromInvite) return;
+    inviteHandled.current = true;
+    sessionStorage.removeItem("ht_invite_code");
+    void joinWithCode(joinCode);
+  }, [ready, userId, phase, busy, joinCode, joinWithCode]);
+
+  function shareInviteWhatsApp(code: string) {
+    openWhatsAppInvite(code);
+  }
 
   const resetToLobby = () => {
     setBundle(null);
@@ -233,11 +287,32 @@ export function OnlinePlay() {
         <div className={styles.card}>
           <h1 className={styles.title}>משחק אונליין</h1>
           <p className={styles.body}>
-            יש להתחבר (או להמשיך כאורח) לפני יצירת חדר או הצטרפות.
+            {joinCode
+              ? `יש לכם הזמנה לחדר ${joinCode}. התחברו (או המשיכו כאורח) כדי להצטרף.`
+              : "יש להתחבר (או להמשיך כאורח) לפני יצירת חדר או הצטרפות."}
           </p>
-          <Link href="/account" className={styles.primary}>
+          <Link
+            href="/account"
+            className={styles.primary}
+            onClick={() => {
+              if (joinCode) {
+                sessionStorage.setItem("ht_invite_code", joinCode);
+              }
+            }}
+          >
             להתחברות
           </Link>
+          {joinCode ? (
+            <Link
+              href="/play/online"
+              className={styles.secondary}
+              onClick={() => {
+                sessionStorage.setItem("ht_invite_code", joinCode);
+              }}
+            >
+              חזרה אחרי התחברות
+            </Link>
+          ) : null}
           <Link href="/" className={styles.link}>
             ← חזרה לדף הבית
           </Link>
@@ -293,23 +368,42 @@ export function OnlinePlay() {
   }
 
   if (phase === "waiting" && bundle) {
+    const code = bundle.room.code;
     return (
       <main className={styles.shell}>
         <div className={styles.card}>
           <h1 className={styles.title}>מחכים ליריב…</h1>
-          <p className={styles.body}>שתפו את הקוד:</p>
+          <p className={styles.body}>שתפו את הקוד או שלחו זימון בוואטסאפ:</p>
           <p className={styles.code} dir="ltr">
-            {bundle.room.code}
+            {code}
           </p>
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={() => shareInviteWhatsApp(code)}
+          >
+            שלחו בוואטסאפ
+          </button>
           <button
             type="button"
             className={styles.secondary}
             onClick={() => {
-              void navigator.clipboard?.writeText(bundle.room.code);
+              const link = roomInviteUrl(code);
+              void navigator.clipboard?.writeText(link);
+              setMessage("קישור ההזמנה הועתק.");
+            }}
+          >
+            העתיקו קישור
+          </button>
+          <button
+            type="button"
+            className={styles.ghost}
+            onClick={() => {
+              void navigator.clipboard?.writeText(code);
               setMessage("הקוד הועתק.");
             }}
           >
-            העתיקו קוד
+            העתיקו קוד בלבד
           </button>
           {message && <p className={styles.message}>{message}</p>}
           <button
