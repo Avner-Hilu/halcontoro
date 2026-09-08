@@ -1,6 +1,6 @@
 # HALCON-TORO
 
-משחק אסטרטגיה לשני שחקנים. Web MVP — משחק מקומי, מול AI, והדרכה.
+משחק אסטרטגיה לשני שחקנים. Web MVP — משחק מקומי, מול AI, הדרכה, וחדרים אונליין.
 
 ## הרצה מקומית
 
@@ -15,6 +15,7 @@ npm run dev
 - **הדרכה** — `/play/tutorial`
 - **מול מחשב** — `/play/ai`
 - **מקומי לשניים** — `/play/local`
+- **אונליין** — `/play/online` (דורש התחברות)
 
 ## מבנה
 
@@ -32,12 +33,23 @@ npm run dev
 
 ## Supabase
 
-1. הריצו את הקובץ `supabase/migrations/001_profiles.sql` ב־SQL Editor
-2. Authentication → Providers → הפעילו **Anonymous** (לאורחים)
-3. Authentication → URL Configuration → הוסיפו ל־Redirect URLs:
-   - `http://localhost:3000/account`
-   - `https://YOUR-DEPLOY-URL/account`
-4. העתיקו URL + publishable key לקובץ `apps/web/.env.local` (ראו `.env.example`)
+1. הריצו ב־SQL Editor (בסדר הזה):
+   - `supabase/migrations/001_profiles.sql`
+   - `supabase/migrations/002_rooms.sql` (חדרים אונליין + Realtime)
+2. Authentication → Providers:
+   - **Email** — מופעל (התחברות/הרשמה עם סיסמה; אפשר לכבות “Confirm email” בביטא כדי להיכנס מיד)
+   - **Google** — הפעילו והזינו Client ID + Client Secret מ־Google Cloud Console
+   - **Anonymous** — לאורחים
+3. Authentication → URL Configuration:
+   - **Site URL** = כתובת האתר החי (לא localhost בפריסה)
+   - Redirect URLs:
+     - `http://localhost:3000/account`
+     - `https://YOUR-DEPLOY-URL/account`
+     - (אופציונלי) `http://localhost:3000/**` ו־`https://YOUR-DEPLOY-URL/**`
+4. ב־Google Cloud → OAuth client: Authorized redirect URI של Supabase  
+   `https://YOUR-PROJECT.supabase.co/auth/v1/callback`
+5. Database → Publications / Realtime: ודאו ש־`rooms` ו־`games` בפרסום `supabase_realtime`
+6. העתיקו URL + publishable key לקובץ `apps/web/.env.local` (ראו `.env.example`)
 
 ## קרדיט
 
